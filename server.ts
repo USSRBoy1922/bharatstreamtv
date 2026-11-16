@@ -66,8 +66,8 @@ interface IptvChannelMeta {
 const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'DDNational.in',
-    name: 'DD National',
-    streamUrl: 'https://d3eyhgoylams0m.cloudfront.net/v1/manifest/93ce20f0f52760bf38be911ff4c91ed02aa2fd92/ed7bd2c7-8d10-4051-b397-2f6b90f99acb/2e9e32a4-c4f7-49c3-96d6-c4e3660c7e3f/3.m3u8',
+    name: 'DD National HD',
+    streamUrl: 'https://fta.ektv.in/live/15/master.m3u8',
     language: 'Hindi',
     category: 'Entertainment',
     network: 'Prasar Bharati',
@@ -76,8 +76,8 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   },
   {
     id: 'DDNews.in',
-    name: 'DD News',
-    streamUrl: 'https://d3eyhgoylams0m.cloudfront.net/v1/manifest/93ce20f0f52760bf38be911ff4c91ed02aa2fd92/ed7bd2c7-8d10-4051-b397-2f6b90f99acb/529d7928-446a-43b5-b37f-83392e9585bb/3.m3u8',
+    name: 'DD News HD',
+    streamUrl: 'https://fta.ektv.in/live/117/117_0.m3u8',
     language: 'Hindi',
     category: 'News',
     network: 'Prasar Bharati',
@@ -87,7 +87,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'DDIndia.in',
     name: 'DD India',
-    streamUrl: 'https://d3eyhgoylams0m.cloudfront.net/v1/manifest/93ce20f0f52760bf38be911ff4c91ed02aa2fd92/ed7bd2c7-8d10-4051-b397-2f6b90f99acb/3b2f6c78-4c04-465c-b6c1-44f25b0a62e1/3.m3u8',
+    streamUrl: 'https://fta.ektv.in/live/119/119_0.m3u8',
     language: 'English',
     category: 'News',
     network: 'Prasar Bharati',
@@ -97,7 +97,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'DDBharati.in',
     name: 'DD Bharati',
-    streamUrl: 'https://d3eyhgoylams0m.cloudfront.net/v1/manifest/93ce20f0f52760bf38be911ff4c91ed02aa2fd92/ed7bd2c7-8d10-4051-b397-2f6b90f99acb/a04a1b8e-c70a-4a57-b315-9902d79c11c2/3.m3u8',
+    streamUrl: 'https://cdn.pishow.tv/ott/live/10/master.m3u8',
     language: 'Hindi',
     category: 'Infotainment',
     network: 'Prasar Bharati',
@@ -107,7 +107,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'DDSports.in',
     name: 'DD Sports',
-    streamUrl: 'https://d3eyhgoylams0m.cloudfront.net/v1/manifest/93ce20f0f52760bf38be911ff4c91ed02aa2fd92/ed7bd2c7-8d10-4051-b397-2f6b90f99acb/04e10d4b-e102-403e-bb82-22b7d013a3d5/3.m3u8',
+    streamUrl: 'https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8',
     language: 'Hindi',
     category: 'Sports',
     network: 'Prasar Bharati',
@@ -116,8 +116,8 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   },
   {
     id: 'SansadTV1.in',
-    name: 'Sansad TV',
-    streamUrl: 'https://d3eyhgoylams0m.cloudfront.net/v1/manifest/93ce20f0f52760bf38be911ff4c91ed02aa2fd92/ed7bd2c7-8d10-4051-b397-2f6b90f99acb/1f1c51c1-903a-47a2-96d5-9c12b9a9c4d1/3.m3u8',
+    name: 'Sansad TV 1 HD',
+    streamUrl: 'https://d2lk5u59tns74c.cloudfront.net/out/v1/fff8f20221d5456e8922e689d71dedc3/index.m3u8',
     language: 'Hindi',
     category: 'News',
     network: 'Parliament of India',
@@ -126,8 +126,8 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   },
   {
     id: 'AajTak.in',
-    name: 'Aaj Tak',
-    streamUrl: 'https://feeds.intoday.in/aajtak/api/master.m3u8',
+    name: 'Aaj Tak HD',
+    streamUrl: 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8',
     language: 'Hindi',
     category: 'News',
     network: 'TV Today Network',
@@ -145,7 +145,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'ABPNews.in',
     name: 'ABP News',
-    streamUrl: 'https://abplivetv.akamaized.net/hls/live/2043010/hindi/master.m3u8',
+    streamUrl: 'https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-472500/abpnews/master.m3u8',
     language: 'Hindi',
     category: 'News',
     network: 'ABP Network',
@@ -163,25 +163,25 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'NDTVIndia.in',
     name: 'NDTV India',
-    streamUrl: 'https://ndtvindiaelemarchana.akamaized.net/hls/live/2003679/ndtvindia/master.m3u8',
+    streamUrl: 'https://backupndtvindiaelemarchana.akamaized.net/hls/live/2004134/ndtvindia/master_1.m3u8',
     language: 'Hindi',
     category: 'News',
     network: 'NDTV',
     resolution: 'HD',
   },
   {
-    id: 'WION.in',
-    name: 'WION',
-    streamUrl: 'https://d7x8z4uqm428c.cloudfront.net/index_4.m3u8',
-    language: 'English',
+    id: 'TV9Bharatvarsh.in',
+    name: 'TV9 Bharatvarsh',
+    streamUrl: 'https://amg01106-amg01106c2-amgplt0747.playout.now3.amagi.tv/amg01106c2/hls.m3u8',
+    language: 'Hindi',
     category: 'News',
-    network: 'Zee Media',
+    network: 'TV9 Network',
     resolution: 'HD',
   },
   {
     id: 'ABPAnanda.in',
     name: 'ABP Ananda',
-    streamUrl: 'https://abplivetv.akamaized.net/hls/live/2043011/ananda/master.m3u8',
+    streamUrl: 'https://d2l4ar6y3mrs4k.cloudfront.net/live-streaming/ananda-livetv/master.m3u8',
     language: 'Bengali',
     category: 'News',
     network: 'ABP Network',
@@ -190,7 +190,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'ABPMajha.in',
     name: 'ABP Majha',
-    streamUrl: 'https://abplivetv.akamaized.net/hls/live/2043012/majha/master.m3u8',
+    streamUrl: 'https://cdn.pishow.tv/ott/live/471/master.m3u8',
     language: 'Marathi',
     category: 'News',
     network: 'ABP Network',
@@ -199,7 +199,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'ABPAsmita.in',
     name: 'ABP Asmita',
-    streamUrl: 'https://abplivetv.akamaized.net/hls/live/2043013/asmita/master.m3u8',
+    streamUrl: 'https://d2l4ar6y3mrs4k.cloudfront.net/live-streaming/asmita-livetv/master.m3u8',
     language: 'Gujarati',
     category: 'News',
     network: 'ABP Network',
@@ -208,25 +208,16 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'ABPSanjha.in',
     name: 'ABP Sanjha',
-    streamUrl: 'https://abplivetv.akamaized.net/hls/live/2043014/sanjha/master.m3u8',
+    streamUrl: 'https://fta.ektv.in/live/641/master.m3u8',
     language: 'Punjabi',
     category: 'News',
     network: 'ABP Network',
     resolution: 'HD',
   },
   {
-    id: '9XM.in',
-    name: '9XM',
-    streamUrl: 'https://d2q8p4pe5spbak.cloudfront.net/bpk-tv/9XM/9XM.isml/index.m3u8',
-    language: 'Hindi',
-    category: 'Music',
-    network: '9X Media',
-    resolution: 'HD',
-  },
-  {
     id: 'B4UMusic.in',
     name: 'B4U Music',
-    streamUrl: 'https://cdnb4u.wiseplayout.com/B4U_Music/master.m3u8',
+    streamUrl: 'https://amg00877-b4unew-amg00877c3-xiaomi-in-5474.playouts.now.amagi.tv/720p/index.m3u8',
     language: 'Hindi',
     category: 'Music',
     network: 'B4U Network',
@@ -235,7 +226,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'B4UMovies.in',
     name: 'B4U Movies',
-    streamUrl: 'https://cdnb4u.wiseplayout.com/B4U_Movies/master.m3u8',
+    streamUrl: 'https://amg00877-b4unew-amg00877c2-xiaomi-in-5489.playouts.now.amagi.tv/playlist.m3u8',
     language: 'Hindi',
     category: 'Movies',
     network: 'B4U Network',
@@ -244,55 +235,64 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'B4UKadak.in',
     name: 'B4U Kadak',
-    streamUrl: 'https://cdnb4u.wiseplayout.com/B4U_Kadak/master.m3u8',
+    streamUrl: 'https://amg00877-b4unew-amg00877c4-xiaomi-in-5473.playouts.now.amagi.tv/playlist.m3u8',
     language: 'Hindi',
     category: 'Movies',
     network: 'B4U Network',
     resolution: 'HD',
   },
   {
-    id: 'Mastiii.in',
-    name: 'Mastiii',
-    streamUrl: 'https://d35j504z0x2vu2.cloudfront.net/v1/manifest/0bc8e8376bd8417a1b6761138aa41c26c7309312/mastiii/23805012-71c8-4c4c-83b5-4c36d021cb6d/0.m3u8',
-    language: 'Hindi',
+    id: '9XJhakaas.in',
+    name: '9X Jhakaas',
+    streamUrl: 'https://amg01281-9xmediapvtltd-9xjhakaas-samsungin-ci2cs.amagi.tv/playlist/amg01281-9xmediapvtltd-9xjhakaas-samsungin/playlist.m3u8',
+    language: 'Marathi',
     category: 'Music',
-    network: 'Sri Adhikari Brothers',
+    network: '9X Media',
+    resolution: 'HD',
+  },
+  {
+    id: '9XTashan.in',
+    name: '9X Tashan',
+    streamUrl: 'https://amg01281-9xmediapvtltd-9xtashan-samsungin-xz1sd.amagi.tv/playlist/amg01281-9xmediapvtltd-9xtashan-samsungin/playlist.m3u8',
+    language: 'Punjabi',
+    category: 'Music',
+    network: '9X Media',
     resolution: 'HD',
   },
   {
     id: 'PuthiyaThalaimurai.in',
     name: 'Puthiya Thalaimurai',
-    streamUrl: 'https://segment.yuppcdn.net/240122/puthiya/playlist.m3u8',
+    streamUrl: 'https://cdn.pishow.tv/ott/live/1261/master.m3u8',
     language: 'Tamil',
     category: 'News',
     network: 'New Generation Media',
     resolution: 'HD',
   },
   {
-    id: 'PolimerNews.in',
-    name: 'Polimer News',
-    streamUrl: 'https://cdn-1.pishow.tv/live/1262/master.m3u8',
-    language: 'Tamil',
-    category: 'News',
-    network: 'Polimer Media',
-    resolution: 'SD',
-  },
-  {
     id: 'TV9Telugu.in',
     name: 'TV9 Telugu',
-    streamUrl: 'https://dyj6gt4964deb.cloudfront.net/live/ram-ram/master.m3u8',
+    streamUrl: 'https://amg01106-amg01106c4-amgplt0747.playout.now3.amagi.tv/amg01106c4/hls.m3u8',
     language: 'Telugu',
     category: 'News',
     network: 'TV9 Network',
     resolution: 'HD',
   },
   {
-    id: 'AsianetNews.in',
-    name: 'Asianet News',
-    streamUrl: 'https://vidcdn.vidgyor.com/asianet-origin/liveabr/playlist.m3u8',
-    language: 'Malayalam',
+    id: 'AsianetSuvarnaNews.in',
+    name: 'Asianet Suvarna News',
+    streamUrl: 'https://asianet-prasarbharati.vgcdn.net/out/v1/bd05c931d9d94d288bbe455cc0f7e229/playlist.m3u8',
+    language: 'Kannada',
     category: 'News',
     network: 'Asianet News Network',
+    resolution: 'HD',
+  },
+  {
+    id: 'TV9Kannada.in',
+    name: 'TV9 Kannada',
+    streamUrl: 'https://amg01106-amg01106c5-amgplt0747.playout.now3.amagi.tv/amg01106c5/hls.m3u8',
+    language: 'Kannada',
+    category: 'News',
+    network: 'TV9 Network',
     resolution: 'HD',
   },
   {
@@ -305,27 +305,9 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
     resolution: 'HD',
   },
   {
-    id: 'TV9Kannada.in',
-    name: 'TV9 Kannada',
-    streamUrl: 'https://dyj6gt4964deb.cloudfront.net/live/tv9kannada/master.m3u8',
-    language: 'Kannada',
-    category: 'News',
-    network: 'TV9 Network',
-    resolution: 'HD',
-  },
-  {
-    id: 'PTCPunjabi.in',
-    name: 'PTC Punjabi',
-    streamUrl: 'https://d35j504z0x2vu2.cloudfront.net/v1/manifest/0bc8e8376bd8417a1b6761138aa41c26c7309312/ptc-punjabi/6f89f2e4-7e3b-4c69-8840-500689715140/0.m3u8',
-    language: 'Punjabi',
-    category: 'Entertainment',
-    network: 'PTC Network',
-    resolution: 'HD',
-  },
-  {
     id: 'AasthaTV.in',
-    name: 'Aastha TV',
-    streamUrl: 'https://aasthaott.akamaized.net/110923/smil:aasthatv.smil/playlist.m3u8',
+    name: 'Aastha HD',
+    streamUrl: 'https://aasthaott.akamaized.net/110923/smil:aasthatv.smil/index.m3u8',
     language: 'Hindi',
     category: 'Devotional',
     network: 'Aastha Broadcasting',
@@ -334,7 +316,7 @@ const CURATED_INDIAN_CHANNELS: Omit<TvChannel, 'number'>[] = [
   {
     id: 'SanskarTV.in',
     name: 'Sanskar TV',
-    streamUrl: 'https://d26a5d4x1x6k3q.cloudfront.net/out/v1/684a36e2f2b546328a1f2857b4a8e4b6/index.m3u8',
+    streamUrl: 'https://d26idhjf0y1p2g.cloudfront.net/out/v1/cd66dd25b9774cb29943bab54bbf3e2f/index.m3u8',
     language: 'Hindi',
     category: 'Devotional',
     network: 'Sanskar Info TV',
@@ -561,7 +543,7 @@ async function buildIndianChannelDirectory(): Promise<{ channels: TvChannel[]; s
     // Gracefully fall back to curated Indian channels if upstream is unreachable
   }
 
-  // Merge curated channels first (priority placement) + deduplicate by normalized name & streamUrl
+  // Merge live upstream URLs first when available so fresh iptv-org streams override static fallbacks
   const seenUrls = new Set<string>();
   const seenNames = new Set<string>();
   const merged: Omit<TvChannel, 'number'>[] = [];
@@ -569,13 +551,13 @@ async function buildIndianChannelDirectory(): Promise<{ channels: TvChannel[]; s
   for (const ch of [...CURATED_INDIAN_CHANNELS, ...parsedUpstream]) {
     const normUrl = ch.streamUrl.trim();
     const normName = ch.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (seenUrls.has(normUrl) || (normName && seenNames.has(normName))) {
-      // Enrich logo if curated item lacked one and upstream has one
-      if (ch.logo && normName) {
-        const existing = merged.find((m) => m.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normName);
-        if (existing && !existing.logo) {
-          existing.logo = ch.logo;
-        }
+    if (seenUrls.has(normUrl)) continue;
+    if (normName && seenNames.has(normName)) {
+      const existing = merged.find((m) => m.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normName);
+      if (existing) {
+        if (ch.logo && !existing.logo) existing.logo = ch.logo;
+        // Prefer fresh HTTPS upstream stream over curated fallback
+        if (normUrl.startsWith('https://')) existing.streamUrl = normUrl;
       }
       continue;
     }
@@ -760,13 +742,16 @@ async function createServer() {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'no-cache');
 
+      const buffer = Buffer.from(await upstream.arrayBuffer());
+      const headSnippet = buffer.subarray(0, 64).toString('utf8').trimStart();
       const isPlaylist =
         contentType.includes('mpegurl') ||
         contentType.includes('m3u') ||
-        targetUrl.pathname.toLowerCase().endsWith('.m3u8');
+        targetUrl.pathname.toLowerCase().endsWith('.m3u8') ||
+        headSnippet.startsWith('#EXTM3U');
 
       if (isPlaylist) {
-        const text = await upstream.text();
+        const text = buffer.toString('utf8');
         const rewritten = rewriteHlsManifest(text, upstream.url || targetUrl.toString());
         res.setHeader('Content-Type', 'application/vnd.apple.mpegurl; charset=utf-8');
         return res.send(rewritten);
@@ -775,7 +760,6 @@ async function createServer() {
       if (contentType) {
         res.setHeader('Content-Type', contentType);
       }
-      const buffer = Buffer.from(await upstream.arrayBuffer());
       return res.send(buffer);
     } catch (err) {
       return res.status(502).send(err instanceof Error ? err.message : 'Relay fetch failed');

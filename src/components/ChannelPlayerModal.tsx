@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Hls from 'hls.js';
+import Hls, { FetchLoader } from 'hls.js';
 import {
   ArrowLeft,
   ChevronDown,
@@ -110,12 +110,18 @@ export function ChannelPlayerModal({
 
   // Reset relay & status on channel change
   useEffect(() => {
+    const needsHttpsRelay =
+      !isNativeCapacitorApp() &&
+      typeof window !== 'undefined' &&
+      window.location.protocol === 'https:' &&
+      channel.streamUrl.startsWith('http://');
+    setUseRelay(needsHttpsRelay);
     setStatus('loading');
     setErrorDetail('');
     setQualityLevels([]);
     setSelectedQuality(-1);
     bumpHud();
-  }, [channel.id, bumpHud]);
+  }, [channel.id, channel.streamUrl, bumpHud]);
 
   // Attach HLS stream
   useEffect(() => {
@@ -136,6 +142,9 @@ export function ChannelPlayerModal({
     setStatus('loading');
     setErrorDetail('');
 
+    let mediaRecoveryAttempts = 0;
+    let triedNativeFallback = false;
+
     const startPlayback = () => {
       video.volume = volume;
       video.muted = isMuted;
@@ -155,13 +164,34 @@ export function ChannelPlayerModal({
         });
     };
 
+    const tryNativeVideoElement = () => {
+      if (triedNativeFallback) return;
+      triedNativeFallback = true;
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      video.src = playbackUrl;
+      const onNativeReady = () => startPlayback();
+      const onNativeErr = () => {
+        setStatus('error');
+        setErrorDetail(
+          'This broadcaster stream is currently offline or geo-restricted outside India.'
+        );
+      };
+      video.addEventListener('loadedmetadata', onNativeReady, { once: true });
+      video.addEventListener('error', onNativeErr, { once: true });
+    };
+
     if (Hls.isSupported()) {
       const hls = new Hls({
-        enableWorker: true,
+        // In native Capacitor Android APK, FetchLoader + enableWorker: false ensures CapacitorHttp handles CORS natively
+        enableWorker: !nativeApp,
+        ...(nativeApp ? { loader: FetchLoader } : {}),
         lowLatencyMode: true,
         backBufferLength: 30,
-        manifestLoadingTimeOut: 10000,
-        fragLoadingTimeOut: 12000,
+        manifestLoadingTimeOut: 12000,
+        fragLoadingTimeOut: 14000,
       });
       hlsRef.current = hls;
 
@@ -180,9 +210,21 @@ export function ChannelPlayerModal({
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (!data.fatal) return;
 
-        // If direct playback failed due to CORS on web, auto-switch to server relay once
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR && mediaRecoveryAttempts < 1) {
+          mediaRecoveryAttempts += 1;
+          hls.recoverMediaError();
+          return;
+        }
+
+        // On Web, auto-switch to server HLS relay once to bypass CORS
         if (!useRelay && !nativeApp) {
           setUseRelay(true);
+          return;
+        }
+
+        // On native Android / Fire TV APK, try Android's native HLS <video> player directly before erroring
+        if (nativeApp && !triedNativeFallback) {
+          tryNativeVideoElement();
           return;
         }
 
