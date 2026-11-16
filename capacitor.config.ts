@@ -8,6 +8,10 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    SystemBars: {
+      hidden: true,
+      insetsHandling: 'disable',
+    },
   },
   android: {
     allowMixedContent: true,

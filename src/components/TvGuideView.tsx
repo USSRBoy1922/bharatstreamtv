@@ -114,6 +114,7 @@ export function TvGuideView({
           {customCount > 0 && (
             <button
               type="button"
+              data-tv-focusable="true"
               onClick={onClearCustomChannels}
               className="px-3.5 py-2 rounded-xl bg-[#131924] border border-slate-700 text-xs font-medium text-slate-300 hover:text-white cursor-pointer"
             >
@@ -149,6 +150,7 @@ export function TvGuideView({
             </div>
             <button
               type="button"
+              data-tv-focusable="true"
               onClick={() => setShowImporter(false)}
               aria-label="Close importer"
               className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white cursor-pointer"
@@ -187,6 +189,7 @@ export function TvGuideView({
           <div className="flex justify-end">
             <button
               type="submit"
+              data-tv-focusable="true"
               disabled={importing}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 text-[#0B0F17] text-sm font-semibold hover:bg-amber-300 disabled:opacity-60 transition-colors cursor-pointer"
             >
@@ -201,6 +204,7 @@ export function TvGuideView({
       <div className="flex flex-wrap items-center gap-3">
         <select
           aria-label="Filter TV guide by language"
+          data-tv-focusable="true"
           value={langFilter}
           onChange={(e) => setLangFilter(e.target.value as IndianLanguage)}
           className="px-3.5 py-2 rounded-xl bg-[#131924] border border-slate-800 text-sm text-slate-200 cursor-pointer"
@@ -214,6 +218,7 @@ export function TvGuideView({
 
         <select
           aria-label="Filter TV guide by category"
+          data-tv-focusable="true"
           value={catFilter}
           onChange={(e) => setCatFilter(e.target.value as TvCategory)}
           className="px-3.5 py-2 rounded-xl bg-[#131924] border border-slate-800 text-sm text-slate-200 cursor-pointer"

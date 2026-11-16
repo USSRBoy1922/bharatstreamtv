@@ -11,7 +11,7 @@ import { SpotlightHero } from './components/SpotlightHero';
 import { TopNav } from './components/TopNav';
 import { TvGuideView } from './components/TvGuideView';
 import { getCurrentIstClock } from './data/indianTvTaxonomy';
-import { loadIndianChannelsClientSide } from './utils/clientChannels';
+import { isNativeCapacitorApp, loadIndianChannelsClientSide } from './utils/clientChannels';
 import type { AppView, IndianLanguage, TvCategory, TvChannel } from './types/tv';
 
 const FAVORITES_KEY = 'bharatstream_favorites_v1';
@@ -155,10 +155,72 @@ export default function App() {
     }
 
     if (best) {
-      best.focus();
-      best.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+      best.focus({ preventScroll: true });
+      if (best.closest('header')) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        best.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+      }
     }
   }, []);
+
+  // Scroll to top cleanly when switching views and focus top initial TV item so screen never starts scrolled/cut off
+  useEffect(() => {
+    if (loading || activeChannel || searchOpen) return;
+    window.scrollTo({ top: 0 });
+    const initial =
+      document.querySelector<HTMLElement>('[data-tv-initial-focus="true"]') ||
+      document.querySelector<HTMLElement>('main [data-tv-focusable="true"]') ||
+      document.querySelector<HTMLElement>('[data-tv-focusable="true"]');
+    initial?.focus({ preventScroll: true });
+  }, [loading, activeView]);
+
+  // Restore focus cleanly after closing Player or Search overlay
+  useEffect(() => {
+    if (loading || activeChannel || searchOpen) return;
+    const active = document.activeElement as HTMLElement | null;
+    if (active && active !== document.body && active.offsetParent !== null) return;
+    const fallback =
+      document.querySelector<HTMLElement>('[data-tv-initial-focus="true"]') ||
+      document.querySelector<HTMLElement>('main [data-tv-focusable="true"]');
+    fallback?.focus({ preventScroll: true });
+  }, [loading, activeChannel, searchOpen]);
+
+  // Expose hardware Back handler for Amazon Fire TV MainActivity
+  useEffect(() => {
+    const win = window as unknown as { __handleFireTvBack?: () => boolean };
+    win.__handleFireTvBack = () => {
+      if (searchOpen) {
+        setSearchOpen(false);
+        return true;
+      }
+      if (activeChannel) {
+        setActiveChannel(null);
+        return true;
+      }
+      if (window.scrollY > 180) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const navFocus =
+          document.querySelector<HTMLElement>('header [aria-current="page"]') ||
+          document.querySelector<HTMLElement>('header [data-tv-focusable="true"]');
+        navFocus?.focus({ preventScroll: true });
+        return true;
+      }
+      if (activeView !== 'live') {
+        setActiveView('live');
+        return true;
+      }
+      if (selectedLanguage !== 'All' || selectedCategory !== 'All') {
+        setSelectedLanguage('All');
+        setSelectedCategory('All');
+        return true;
+      }
+      return false; // Let Fire TV OS exit app when already at top of home screen
+    };
+    return () => {
+      delete win.__handleFireTvBack;
+    };
+  }, [searchOpen, activeChannel, activeView, selectedLanguage, selectedCategory]);
 
   const handlePlayChannel = useCallback((channel: TvChannel) => {
     setActiveChannel(channel);
@@ -236,6 +298,17 @@ export default function App() {
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         moveSpatialFocus('up');
+      } else if (e.key === 's' || e.key === 'S' || e.key === 'F3') {
+        e.preventDefault();
+        setSearchOpen(true);
+      } else if (e.key === 'g' || e.key === 'G') {
+        e.preventDefault();
+        setActiveView((v) => (v === 'guide' ? 'live' : 'guide'));
+      } else if (e.key === 'Backspace' || e.key === 'Escape') {
+        const win = window as unknown as { __handleFireTvBack?: () => boolean };
+        if (win.__handleFireTvBack?.()) {
+          e.preventDefault();
+        }
       } else if (/^[0-9]$/.test(e.key)) {
         const nextBuffer = (dialBuffer + e.key).slice(0, 3);
         setDialBuffer(nextBuffer);
@@ -296,7 +369,7 @@ export default function App() {
         onOpenSearch={() => setSearchOpen(true)}
       />
 
-      <main className="flex-1 max-w-[1440px] w-full mx-auto px-6 lg:px-10 py-6 lg:py-8 space-y-8">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-8 lg:px-12 py-5 lg:py-7 space-y-8">
         {loading && allChannels.length === 0 ? (
           <div className="space-y-6" aria-busy="true" aria-label="Loading Indian channels">
             <div className="h-[340px] rounded-2xl bg-[#131924] border border-slate-800 animate-pulse" />
@@ -318,6 +391,7 @@ export default function App() {
             <p className="text-sm text-slate-400 max-w-md mx-auto">{loadError}</p>
             <button
               type="button"
+              data-tv-focusable="true"
               onClick={() => fetchChannels(true)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 text-[#0B0F17] text-sm font-semibold hover:bg-amber-300 cursor-pointer"
             >
@@ -386,11 +460,12 @@ export default function App() {
                       {(selectedLanguage !== 'All' || selectedCategory !== 'All') && (
                         <button
                           type="button"
+                          data-tv-focusable="true"
                           onClick={() => {
                             setSelectedLanguage('All');
                             setSelectedCategory('All');
                           }}
-                          className="text-xs font-medium text-amber-400 hover:text-amber-300 cursor-pointer"
+                          className="text-xs font-medium text-amber-400 hover:text-amber-300 cursor-pointer px-2 py-1 rounded-lg"
                         >
                           Reset Filters
                         </button>
@@ -411,6 +486,7 @@ export default function App() {
                       </p>
                       <button
                         type="button"
+                        data-tv-focusable="true"
                         onClick={() => {
                           setSelectedLanguage('All');
                           setSelectedCategory('All');
@@ -483,6 +559,7 @@ export default function App() {
                     </div>
                     <button
                       type="button"
+                      data-tv-focusable="true"
                       onClick={() => setActiveView('live')}
                       className="px-5 py-2.5 rounded-xl bg-amber-400 text-[#0B0F17] text-sm font-semibold hover:bg-amber-300 cursor-pointer"
                     >
@@ -521,23 +598,25 @@ export default function App() {
 
       {/* Quiet Footer */}
       <footer className="border-t border-slate-800/80 py-5 mt-8">
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p>
             BharatStream TV · Indian Internet Television Launcher · IST {istClock}
           </p>
           <div className="flex items-center gap-4">
             <button
               type="button"
+              data-tv-focusable="true"
               onClick={() => fetchChannels(true)}
-              className="inline-flex items-center gap-1.5 text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-slate-300 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded-lg"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh Lineup</span>
             </button>
             <button
               type="button"
+              data-tv-focusable="true"
               onClick={() => setActiveView('guide')}
-              className="text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
+              className="text-slate-300 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded-lg"
             >
               Add M3U Playlist
             </button>
@@ -576,8 +655,8 @@ export default function App() {
         />
       )}
 
-      {/* Tactile Fire TV Remote Widget */}
-      {!activeChannel && !searchOpen && (
+      {/* Tactile Fire TV Remote Widget (shown on web/desktop, hidden inside native Fire TV APK) */}
+      {!activeChannel && !searchOpen && !isNativeCapacitorApp() && (
         <RemoteControlDrawer
           onNavigateDirection={moveSpatialFocus}
           onSelect={() => {

@@ -275,14 +275,51 @@ export function ChannelPlayerModal({
     video.volume = volume;
   }, [isMuted, volume]);
 
+  // Auto-focus Next Channel button if stream errors so Fire TV remote OK works immediately
+  useEffect(() => {
+    if (status === 'error') {
+      const btn = document.querySelector<HTMLElement>('[data-player-error-focus="true"]');
+      btn?.focus();
+    }
+  }, [status]);
+
+  // Auto-focus first item in Quick Channel Surf drawer when opened
+  useEffect(() => {
+    if (guideOpen) {
+      const first = document.querySelector<HTMLElement>('[data-guide-item="true"]');
+      first?.focus();
+    }
+  }, [guideOpen]);
+
   // Keyboard / Fire TV Remote controls inside player
   useEffect(() => {
+    const movePlayerFocus = (dir: -1 | 1) => {
+      const selector = guideOpen
+        ? '[data-guide-item="true"]'
+        : '[data-player-focusable="true"]';
+      const nodes = Array.from(
+        document.querySelectorAll<HTMLElement>(selector)
+      ).filter((el) => el.offsetParent !== null);
+      if (nodes.length === 0) return;
+      const cur = document.activeElement as HTMLElement | null;
+      const idx = cur ? nodes.indexOf(cur) : -1;
+      const nextIdx =
+        idx === -1
+          ? 0
+          : (idx + dir + nodes.length) % nodes.length;
+      nodes[nextIdx].focus();
+      nodes[nextIdx].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      const isInput = target?.tagName === 'INPUT';
+      const isInput = target?.tagName === 'INPUT' || target?.tagName === 'SELECT';
+      const wasHidden = !hudVisible;
       bumpHud();
 
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' || e.key === 'Backspace') {
+        if (isInput && e.key === 'Backspace') return;
+        e.preventDefault();
         if (guideOpen) {
           setGuideOpen(false);
         } else {
@@ -309,18 +346,52 @@ export function ChannelPlayerModal({
         setGuideOpen((g) => !g);
       } else if (e.key === 'f' || e.key === 'F') {
         onToggleFavorite(channel.id);
-      } else if (e.key === 'PageUp' || (!guideOpen && e.key === 'ArrowUp')) {
+      } else if (e.key === 'PageUp') {
         e.preventDefault();
         zapChannel(-1);
-      } else if (e.key === 'PageDown' || (!guideOpen && e.key === 'ArrowDown')) {
+      } else if (e.key === 'PageDown') {
         e.preventDefault();
         zapChannel(1);
+      } else if (guideOpen) {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          movePlayerFocus(-1);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          movePlayerFocus(1);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          setGuideOpen(false);
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        zapChannel(-1);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        zapChannel(1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (wasHidden) {
+          const first = document.querySelector<HTMLElement>('[data-player-focusable="true"]');
+          first?.focus();
+        } else {
+          movePlayerFocus(e.key === 'ArrowRight' ? 1 : -1);
+        }
+      } else if (e.key === 'Enter') {
+        const cur = document.activeElement as HTMLElement | null;
+        if (cur && cur.getAttribute('data-player-focusable') === 'true') {
+          return; // Let native button click fire
+        }
+        if (wasHidden) {
+          const playBtn = document.querySelector<HTMLElement>('[data-player-play="true"]');
+          playBtn?.focus();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [bumpHud, channel.id, guideOpen, onClose, onToggleFavorite, zapChannel]);
+  }, [bumpHud, channel.id, guideOpen, hudVisible, onClose, onToggleFavorite, zapChannel]);
 
   // Fullscreen listener
   useEffect(() => {
@@ -386,13 +457,13 @@ export function ChannelPlayerModal({
       aria-label={`Watching ${channel.name}`}
       onMouseMove={bumpHud}
       onClick={bumpHud}
-      className="fixed inset-0 z-50 bg-black flex flex-col justify-between select-none"
+      className="fixed inset-0 w-screen h-screen overflow-hidden z-50 bg-black select-none"
     >
-      {/* Video Canvas */}
+      {/* Video Canvas (absolute inset-0 ensures full fit with zero top clipping on TVs) */}
       <video
         ref={videoRef}
         playsInline
-        className="w-full h-full object-contain bg-black"
+        className="absolute inset-0 w-full h-full object-contain bg-black"
         onClick={togglePlayPause}
       />
 
@@ -434,6 +505,7 @@ export function ChannelPlayerModal({
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
                 type="button"
+                data-tv-focusable="true"
                 onClick={() => {
                   setStatus('loading');
                   setUseRelay((r) => !r);
@@ -446,6 +518,8 @@ export function ChannelPlayerModal({
 
               <button
                 type="button"
+                data-tv-focusable="true"
+                data-player-error-focus="true"
                 onClick={() => zapChannel(1)}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1A2232] border border-slate-700 text-slate-100 text-sm font-medium hover:bg-[#243046] transition-colors cursor-pointer"
               >
@@ -455,6 +529,7 @@ export function ChannelPlayerModal({
 
               <button
                 type="button"
+                data-tv-focusable="true"
                 onClick={onClose}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 text-sm font-medium hover:text-white cursor-pointer"
               >
@@ -465,9 +540,9 @@ export function ChannelPlayerModal({
         </div>
       )}
 
-      {/* Top Player HUD */}
+      {/* Top Player HUD (with TV overscan padding) */}
       <div
-        className={`absolute top-0 inset-x-0 z-20 p-5 sm:p-7 bg-gradient-to-b from-black/90 via-black/55 to-transparent transition-opacity duration-200 ${
+        className={`absolute top-0 inset-x-0 z-20 p-6 sm:p-8 lg:p-10 bg-gradient-to-b from-black/90 via-black/55 to-transparent transition-opacity duration-200 ${
           hudVisible || status === 'error' ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -475,6 +550,8 @@ export function ChannelPlayerModal({
           <div className="flex items-center gap-4 min-w-0">
             <button
               type="button"
+              data-tv-focusable="true"
+              data-player-focusable="true"
               onClick={onClose}
               className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#131924]/90 border border-slate-700/80 text-slate-100 text-sm font-medium hover:border-amber-400 transition-colors cursor-pointer shrink-0"
             >
@@ -503,6 +580,8 @@ export function ChannelPlayerModal({
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
+              data-tv-focusable="true"
+              data-player-focusable="true"
               onClick={() => onToggleFavorite(channel.id)}
               aria-label={isFavorite ? 'Remove favorite' : 'Add favorite'}
               className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#131924]/90 border border-slate-700/80 text-slate-200 text-sm hover:text-amber-400 transition-colors cursor-pointer"
@@ -513,6 +592,8 @@ export function ChannelPlayerModal({
 
             <button
               type="button"
+              data-tv-focusable="true"
+              data-player-focusable="true"
               onClick={() => setGuideOpen((o) => !o)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#131924]/90 border border-slate-700/80 text-slate-100 text-sm font-medium hover:border-amber-400 transition-colors cursor-pointer"
             >
@@ -523,9 +604,9 @@ export function ChannelPlayerModal({
         </div>
       </div>
 
-      {/* Bottom Player Controls & Program Bar */}
+      {/* Bottom Player Controls & Program Bar (with TV overscan padding) */}
       <div
-        className={`absolute bottom-0 inset-x-0 z-20 p-5 sm:p-7 bg-gradient-to-t from-black/95 via-black/75 to-transparent transition-opacity duration-200 ${
+        className={`absolute bottom-0 inset-x-0 z-20 p-6 sm:p-8 lg:p-10 bg-gradient-to-t from-black/95 via-black/75 to-transparent transition-opacity duration-200 ${
           hudVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -546,7 +627,7 @@ export function ChannelPlayerModal({
 
             <div className="flex items-center gap-2 text-xs text-slate-400">
               <ShieldCheck className="w-4 h-4 text-slate-400" aria-hidden="true" />
-              <span>{useRelay ? 'Relay Mode' : 'Direct HLS'}</span>
+              <span>{useRelay ? 'Relay Mode' : 'Direct HLS'} · Use Up/Down to zap</span>
             </div>
           </div>
 
@@ -555,6 +636,9 @@ export function ChannelPlayerModal({
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                data-tv-focusable="true"
+                data-player-focusable="true"
+                data-player-play="true"
                 onClick={togglePlayPause}
                 aria-label={status === 'playing' ? 'Pause' : 'Play'}
                 className="w-10 h-10 rounded-xl bg-amber-400 text-[#0B0F17] flex items-center justify-center hover:bg-amber-300 transition-colors cursor-pointer"
@@ -568,6 +652,8 @@ export function ChannelPlayerModal({
 
               <button
                 type="button"
+                data-tv-focusable="true"
+                data-player-focusable="true"
                 onClick={() => zapChannel(-1)}
                 aria-label="Previous channel"
                 className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#131924] border border-slate-700/80 text-slate-200 text-xs font-medium hover:border-amber-400 transition-colors cursor-pointer"
@@ -578,6 +664,8 @@ export function ChannelPlayerModal({
 
               <button
                 type="button"
+                data-tv-focusable="true"
+                data-player-focusable="true"
                 onClick={() => zapChannel(1)}
                 aria-label="Next channel"
                 className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#131924] border border-slate-700/80 text-slate-200 text-xs font-medium hover:border-amber-400 transition-colors cursor-pointer"
@@ -589,6 +677,8 @@ export function ChannelPlayerModal({
               <div className="flex items-center gap-2 ml-2">
                 <button
                   type="button"
+                  data-tv-focusable="true"
+                  data-player-focusable="true"
                   onClick={() => setIsMuted((m) => !m)}
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                   className="w-9 h-9 rounded-lg bg-[#131924] border border-slate-700/80 flex items-center justify-center text-slate-200 hover:text-amber-400 cursor-pointer"
@@ -635,6 +725,8 @@ export function ChannelPlayerModal({
 
               <button
                 type="button"
+                data-tv-focusable="true"
+                data-player-focusable="true"
                 onClick={() => setUseRelay((r) => !r)}
                 className="px-3 py-2 rounded-xl bg-[#131924] border border-slate-700/80 text-slate-200 text-xs font-medium hover:border-amber-400 transition-colors cursor-pointer"
               >
@@ -644,6 +736,8 @@ export function ChannelPlayerModal({
               {document.pictureInPictureEnabled && (
                 <button
                   type="button"
+                  data-tv-focusable="true"
+                  data-player-focusable="true"
                   onClick={togglePip}
                   aria-label="Picture in Picture"
                   className="w-9 h-9 rounded-xl bg-[#131924] border border-slate-700/80 flex items-center justify-center text-slate-200 hover:text-amber-400 cursor-pointer"
@@ -654,6 +748,8 @@ export function ChannelPlayerModal({
 
               <button
                 type="button"
+                data-tv-focusable="true"
+                data-player-focusable="true"
                 onClick={toggleFullscreen}
                 aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
                 className="w-9 h-9 rounded-xl bg-[#131924] border border-slate-700/80 flex items-center justify-center text-slate-200 hover:text-amber-400 cursor-pointer"
@@ -674,7 +770,7 @@ export function ChannelPlayerModal({
         <aside
           aria-label="Quick Channel Switcher"
           onClick={(e) => e.stopPropagation()}
-          className="absolute top-0 right-0 bottom-0 w-full max-w-sm bg-[#0B0F17]/95 backdrop-blur-xl border-l border-slate-800 z-30 flex flex-col"
+          className="absolute top-0 right-0 bottom-0 w-full max-w-sm bg-[#0B0F17]/95 backdrop-blur-xl border-l border-slate-800 z-30 flex flex-col pt-4 pb-4"
         >
           <div className="p-4 border-b border-slate-800 flex items-center justify-between gap-3">
             <h3 className="font-display text-base font-semibold text-white">
@@ -707,6 +803,8 @@ export function ChannelPlayerModal({
                 <button
                   key={ch.id}
                   type="button"
+                  data-tv-focusable="true"
+                  data-guide-item="true"
                   onClick={() => {
                     setUseRelay(false);
                     onSelectChannel(ch);

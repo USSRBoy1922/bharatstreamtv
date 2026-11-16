@@ -50,7 +50,7 @@ export function SpotlightHero({
       aria-label="Featured Indian Broadcast Spotlight"
       className="relative w-full overflow-hidden rounded-2xl border border-slate-800/80 bg-[#131924]"
     >
-      <div className="relative min-h-[340px] lg:min-h-[410px] flex items-end">
+      <div className="relative min-h-[210px] sm:min-h-[245px] xl:min-h-[310px] flex items-end">
         {/* Background photography with zero-broken-image fallback */}
         {!imgErrors[currentSpot.id] ? (
           <img
@@ -108,6 +108,7 @@ export function SpotlightHero({
                   type="button"
                   onClick={() => onPlayChannel(matchedChannel)}
                   data-tv-focusable="true"
+                  data-tv-initial-focus="true"
                   className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-amber-400 text-[#0B0F17] font-semibold text-sm hover:bg-amber-300 transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <Play className="w-4 h-4 fill-current" aria-hidden="true" />
@@ -119,6 +120,7 @@ export function SpotlightHero({
                 type="button"
                 onClick={() => onApplyFilter('All', currentSpot.category)}
                 data-tv-focusable="true"
+                data-tv-initial-focus={!matchedChannel ? 'true' : undefined}
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#1A2232]/90 border border-slate-700/80 text-slate-100 font-medium text-sm hover:bg-[#232D42] transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>Browse {currentSpot.category}</span>

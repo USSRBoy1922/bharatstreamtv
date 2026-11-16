@@ -9,18 +9,30 @@
 }
 
 @layer base {
-  html {
+  html,
+  body {
     font-family: var(--font-sans);
     background-color: #0B0F17;
     color: #F1F5F9;
     scroll-behavior: smooth;
+    scroll-padding-top: 48px;
+    scroll-padding-bottom: 48px;
+    overflow-x: hidden;
   }
 
-  /* 10-foot Smart TV focus ring discipline */
+  /* 10-foot Smart TV focus ring discipline — visible for both keyboard and programmatic D-pad focus */
   :focus-visible {
-    outline: 2px solid #F59E0B;
+    outline: 3px solid #F59E0B;
     outline-offset: 2px;
   }
+}
+
+/* Unmistakable 10-foot Fire TV focus state for all remote-navigable tiles and buttons */
+[data-tv-focusable="true"]:focus,
+[data-search-focusable="true"]:focus {
+  outline: 3px solid #F59E0B;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.25);
 }
 
 /* Custom subtle scrollbars for horizontal TV rails */
