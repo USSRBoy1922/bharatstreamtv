@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import { getChannelEpgSchedule } from '../data/indianTvTaxonomy';
+import { isNativeCapacitorApp } from '../utils/clientChannels';
 import type { TvChannel } from '../types/tv';
 import { ChannelLogo } from './ChannelLogo';
 
@@ -126,9 +127,11 @@ export function ChannelPlayerModal({
       hlsRef.current = null;
     }
 
-    const playbackUrl = useRelay
-      ? `/api/hls-proxy?url=${encodeURIComponent(channel.streamUrl)}`
-      : channel.streamUrl;
+    const nativeApp = isNativeCapacitorApp();
+    const playbackUrl =
+      useRelay && !nativeApp
+        ? `/api/hls-proxy?url=${encodeURIComponent(channel.streamUrl)}`
+        : channel.streamUrl;
 
     setStatus('loading');
     setErrorDetail('');
@@ -177,8 +180,8 @@ export function ChannelPlayerModal({
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (!data.fatal) return;
 
-        // If direct playback failed due to CORS or network restriction, auto-switch to server relay once
-        if (!useRelay) {
+        // If direct playback failed due to CORS on web, auto-switch to server relay once
+        if (!useRelay && !nativeApp) {
           setUseRelay(true);
           return;
         }

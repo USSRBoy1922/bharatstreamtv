@@ -6,6 +6,7 @@ import {
   getChannelEpgSchedule,
   getCurrentIstClock,
 } from '../data/indianTvTaxonomy';
+import { parseM3uClient } from '../utils/clientChannels';
 import type { IndianLanguage, TvCategory, TvChannel } from '../types/tv';
 import { ChannelLogo } from './ChannelLogo';
 
@@ -53,20 +54,40 @@ export function TvGuideView({
     setImporting(true);
 
     try {
-      const res = await fetch('/api/playlist/parse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: playlistUrl.trim() || undefined,
-          content: playlistText.trim() || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to parse playlist');
+      let importedChannels: TvChannel[] = [];
+
+      try {
+        const res = await fetch('/api/playlist/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: playlistUrl.trim() || undefined,
+            content: playlistText.trim() || undefined,
+          }),
+        });
+        const contentType = res.headers.get('content-type') || '';
+        if (!res.ok || !contentType.includes('application/json')) {
+          throw new Error('Server parser unavailable');
+        }
+        const data = await res.json();
+        importedChannels = data.channels || [];
+      } catch {
+        // Standalone APK fallback: fetch & parse M3U directly on client
+        let rawText = playlistText.trim();
+        if (!rawText && playlistUrl.trim()) {
+          const m3uRes = await fetch(playlistUrl.trim());
+          if (!m3uRes.ok) throw new Error(`Playlist URL returned HTTP ${m3uRes.status}`);
+          rawText = await m3uRes.text();
+        }
+        const parsed = parseM3uClient(rawText, new Map(), true);
+        if (parsed.length === 0) {
+          throw new Error('No playable HTTP/HTTPS streams found in that playlist.');
+        }
+        importedChannels = parsed.map((ch, idx) => ({ ...ch, number: 901 + idx }));
       }
-      onAddCustomChannels(data.channels);
-      setImportSuccess(`Added ${data.channels.length} channels to your lineup.`);
+
+      onAddCustomChannels(importedChannels);
+      setImportSuccess(`Added ${importedChannels.length} channels to your lineup.`);
       setPlaylistUrl('');
       setPlaylistText('');
     } catch (err) {

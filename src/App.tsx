@@ -11,6 +11,7 @@ import { SpotlightHero } from './components/SpotlightHero';
 import { TopNav } from './components/TopNav';
 import { TvGuideView } from './components/TvGuideView';
 import { getCurrentIstClock } from './data/indianTvTaxonomy';
+import { loadIndianChannelsClientSide } from './utils/clientChannels';
 import type { AppView, IndianLanguage, TvCategory, TvChannel } from './types/tv';
 
 const FAVORITES_KEY = 'bharatstream_favorites_v1';
@@ -57,11 +58,19 @@ export default function App() {
     setLoadError('');
     try {
       const res = await fetch(forceRefresh ? '/api/channels?refresh=1' : '/api/channels');
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      const contentType = res.headers.get('content-type') || '';
+      if (!res.ok || !contentType.includes('application/json')) {
+        throw new Error('Backend API unavailable');
+      }
       const data = (await res.json()) as { channels: TvChannel[] };
       setDirectoryChannels(data.channels || []);
-    } catch (err) {
-      setLoadError(err instanceof Error ? err.message : 'Unable to load Indian channel directory');
+    } catch {
+      try {
+        const clientChannels = await loadIndianChannelsClientSide();
+        setDirectoryChannels(clientChannels);
+      } catch (err) {
+        setLoadError(err instanceof Error ? err.message : 'Unable to load Indian channel directory');
+      }
     } finally {
       setLoading(false);
     }
